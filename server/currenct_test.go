@@ -5,23 +5,6 @@ import (
 	"testing"
 )
 
-func TestCurrencyConversionNewServer(t *testing.T) {
-	server, err := New()
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	_, err = server.convert("USD", "DKK", 1)
-	if err == nil {
-		t.Fatal("Expected to fail!")
-	}
-
-	_, err = server.createResponse("DKK")
-	if err == nil {
-		t.Fatal("Expected to fail!")
-	}
-}
-
 func TestCurrencyConversion(t *testing.T) {
 	amount := 123.45
 	converted, err := server.convert("USD", "DKK", amount)
@@ -47,7 +30,7 @@ func TestCurrencyConversion(t *testing.T) {
 		t.Fatal(err3)
 	}
 
-	if converted3 != amount {
+	if fmt.Sprintf("%.2f", amount) != fmt.Sprintf("%.2f", converted3) {
 		t.Fatal("Expected to be the same:", amount, converted3)
 	}
 }
