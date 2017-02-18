@@ -70,6 +70,7 @@ func (s *Server) currenciesHandler(w http.ResponseWriter, r *http.Request) {
 		// GET - create response with EUR base
 		res, err := s.createResponse(eur)
 		s.respondJson(w, res, err)
+		s.currencyHits.Add(1)
 	} else if r.Method == http.MethodPost {
 		// POST - parse request to get base, fail on error
 		var req currencyRequest
@@ -83,6 +84,7 @@ func (s *Server) currenciesHandler(w http.ResponseWriter, r *http.Request) {
 		// create reponse with parsed base
 		res, err := s.createResponse(req.BaseCurrency)
 		s.respondJson(w, res, err)
+		s.currencyHits.Add(1)
 	} else {
 		http.Error(w, "", http.StatusBadRequest)
 	}
@@ -104,6 +106,7 @@ func (s *Server) convertHandler(w http.ResponseWriter, r *http.Request) {
 		// create the convertion response
 		res, err := s.createConvertResponse(req.TargetCurrency, req.BaseCurrency, req.Amounts)
 		s.respondJson(w, res, err)
+		s.convertHits.Add(1)
 	} else {
 		http.Error(w, "", http.StatusBadRequest)
 	}
@@ -128,6 +131,7 @@ func (s *Server) webhookHandler(w http.ResponseWriter, r *http.Request) {
 			defer s.mutex.Unlock()
 
 			s.webhooks[hook.Url] = hook
+			s.webhookHits.Add(1)
 		} else {
 			http.Error(w, "", http.StatusInternalServerError)
 			return

@@ -1,6 +1,7 @@
 package server
 
 import (
+	"expvar"
 	"fmt"
 	"log"
 	"net/http"
@@ -28,6 +29,11 @@ type Server struct {
 
 	mutex    *sync.Mutex        // used for locking when handling webhooks
 	webhooks map[string]webhook // holds webhooks
+
+	currencyHits    *expvar.Int
+	convertHits     *expvar.Int
+	webhookHits     *expvar.Int
+	webhookTriggers *expvar.Int
 }
 
 // representation of a webhook
@@ -57,6 +63,11 @@ func New() (s *Server, err error) {
 
 		mutex:    &sync.Mutex{},
 		webhooks: make(map[string]webhook),
+
+		currencyHits:    expvar.NewInt("currency_hits"),
+		convertHits:     expvar.NewInt("convert_hits"),
+		webhookHits:     expvar.NewInt("webhook_hits"),
+		webhookTriggers: expvar.NewInt("webhook_triggers"),
 	}, nil
 }
 
@@ -66,7 +77,8 @@ func (s *Server) Run() (err error) {
 
 	// starts the currency updating goroutine
 	s.startCurrencyUpdating()
-	return http.ListenAndServe(fmt.Sprintf("%s:%d", s.host, s.port), s)
+	http.Handle("/", s)
+	return http.ListenAndServe(fmt.Sprintf("%s:%d", s.host, s.port), nil)
 }
 
 // gets the value of the given environment variable, if no value is set

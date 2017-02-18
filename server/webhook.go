@@ -80,6 +80,8 @@ func (s *Server) callSingleWebhook(hook webhook) (err error) {
 		log.Printf("Webhook return code: %d\n", res.StatusCode)
 	}
 
+	s.webhookTriggers.Add(1)
+
 	if res.StatusCode != http.StatusOK {
 		return fmt.Errorf("Webhook returned: %d", res.StatusCode)
 	}
