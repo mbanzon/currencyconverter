@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"strings"
 )
 
 // struct for the currency rates
@@ -60,7 +61,11 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	case "/webhook":
 		s.webhookHandler(w, r)
 	default:
-		http.NotFound(w, r)
+		if strings.HasPrefix(r.RequestURI, "/script?base=") {
+			s.scriptHandler(w, r)
+		} else {
+			http.NotFound(w, r)
+		}
 	}
 }
 
